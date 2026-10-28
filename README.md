@@ -4,6 +4,10 @@ Practical operational scripts, diagnostic utilities, and runbooks for servers an
 
 Everything here is plain shell or single-file scripts with zero unnecessary dependencies. Built so that when something breaks at 2am, you can diagnose and fix it quickly and safely.
 
+<p align="center">
+  <img src="assets/toolbox-showcase.gif" alt="Toolbox Motion Graphic Demo" width="100%" />
+</p>
+
 ## Layout
 
     scripts/   production operational and diagnostic tools (each in its own directory)
