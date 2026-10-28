@@ -8,7 +8,13 @@
 # variable that was empty at build time.
 set -euo pipefail
 
-APP_DIR=${1:?usage: $0 <app-dir>}
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ] || [ $# -eq 0 ]; then
+  echo "Usage: $0 <app-dir>"
+  echo "Verifies a Next.js production build (.next, standalone assets, NEXT_PUBLIC_ variables, BUILD_ID)."
+  exit 0
+fi
+
+APP_DIR=${1}
 cd "$APP_DIR"
 
 status=0

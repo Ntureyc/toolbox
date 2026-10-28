@@ -37,8 +37,7 @@ restart command.
 
 ## Conventions in these documents
 
-- Commands are run on the box they name. `business-koro` means
-  `/home/ntureyc/business-koro`.
+- Commands are run from your project directory (e.g. `/var/www/<app>` or `~/apps/<app>`).
 - Anything destructive is marked as such.
 - When a runbook says "check the logs", it means:
 

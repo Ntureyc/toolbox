@@ -6,6 +6,17 @@ set -euo pipefail
 TOP=${TOP:-15}
 MOUNT=${MOUNT:-/}
 
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  echo "Usage: $0 [mount-point]"
+  echo "Reports disk usage, inodes, top directories and largest files."
+  echo "Options/Env: TOP=15, MOUNT=/"
+  exit 0
+fi
+
+if [ -n "${1:-}" ]; then
+  MOUNT="$1"
+fi
+
 if [ "$(id -u)" -ne 0 ]; then
   echo "note: run as root for a complete picture" >&2
 fi

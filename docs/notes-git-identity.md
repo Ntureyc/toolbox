@@ -20,14 +20,13 @@ attribution at all.
 
 ## The three things that go wrong
 
-**A different email.** Committing with `princekakku220@gmail.com` when
-the repo is under `Ntureyc` credits the `princekakku220-lang` account.
+**A different email.** Committing with `personal-alt@example.com` when
+the repo is under your main account credits the alt account.
 The commits exist, the work was done, and the graph stays empty.
 
-**An email that is not linked to any account.** `Ntureuc@gmail.com` -
-note the capital U, a typo - resolves to nothing. The commits are
-invisible on every profile including the author's own. 82 commits,
-invisible.
+**An email that is not linked to any account.** `user-typo@example.com` -
+a small typo - resolves to nothing. The commits are
+invisible on every profile including the author's own.
 
 **A noreply email that does not match the account id.** The noreply
 form is `<numeric-id>+<login>@users.noreply.github.com`. If the id
@@ -47,8 +46,8 @@ Two options, and they are not exclusive.
 
 **Change the identity used for new commits.** Set it once, globally:
 
-    git config --global user.name "Ntureyc"
-    git config --global user.email "ntureyc@gmail.com"
+    git config --global user.name "Your Name"
+    git config --global user.email "you@example.com"
 
 Check it took effect in a repo that has a local override:
 

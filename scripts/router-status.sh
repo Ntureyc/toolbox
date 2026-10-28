@@ -6,9 +6,19 @@
 #   router-status.sh <router-host> [username]
 set -euo pipefail
 
-ROUTER=${1:?usage: $0 <router-host> [username]}
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ] || [ $# -eq 0 ]; then
+  echo "Usage: ROUTER_PASS=<pass> $0 <router-host> [username]"
+  echo "Checks PPPoE sessions and client status on MikroTik RouterOS."
+  exit 0
+fi
+
+ROUTER=${1}
 USER=${2:-admin}
-PASS=${ROUTER_PASS:?ROUTER_PASS must be set}
+PASS=${ROUTER_PASS:-}
+if [ -z "$PASS" ]; then
+  echo "error: ROUTER_PASS environment variable must be set" >&2
+  exit 2
+fi
 TIMEOUT=${TIMEOUT:-10}
 
 base="http://${ROUTER}"

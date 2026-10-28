@@ -9,8 +9,19 @@
 # weekly and monthly tiers so the three copies cost one file.
 set -euo pipefail
 
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  echo "Usage: DATABASE_URL=<url> $0"
+  echo "   or: $0 <database-url>"
+  echo "Options/Env: BACKUP_DIR=/var/backups/pg, DRY_RUN=1, KEEP_DAILY=14, KEEP_WEEKLY=8, KEEP_MONTHLY=12"
+  exit 0
+fi
+
 BACKUP_DIR=${BACKUP_DIR:-/var/backups/pg}
-DATABASE_URL=${DATABASE_URL:?DATABASE_URL must be set}
+DATABASE_URL=${1:-${DATABASE_URL:-}}
+if [ -z "$DATABASE_URL" ]; then
+  echo "error: DATABASE_URL must be set as an environment variable or passed as argument 1" >&2
+  exit 2
+fi
 KEEP_DAILY=${KEEP_DAILY:-14}
 KEEP_WEEKLY=${KEEP_WEEKLY:-8}
 KEEP_MONTHLY=${KEEP_MONTHLY:-12}

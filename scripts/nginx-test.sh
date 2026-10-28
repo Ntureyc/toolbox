@@ -4,6 +4,12 @@
 # which file before touching anything.
 set -euo pipefail
 
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  echo "Usage: $0 [conf-dir]"
+  echo "Validates nginx configuration (nginx -t) and highlights failing virtual hosts."
+  exit 0
+fi
+
 CONF_DIR=${1:-/etc/nginx/sites-enabled}
 
 echo "== nginx -t =="

@@ -8,7 +8,12 @@
 # process is not already crash-looping.
 set -euo pipefail
 
-APP_DIR=${1:?usage: $0 <app-dir> [expected-commit]}
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ] || [ $# -eq 0 ]; then
+  sed -n '2,/^set -euo pipefail/p' "$0" | grep -v '^set' | sed 's/^# //' | sed 's/^#//'
+  exit 0
+fi
+
+APP_DIR=${1}
 EXPECTED=${2:-}
 
 cd "$APP_DIR"
@@ -21,10 +26,16 @@ echo "== $APP_DIR =="
 
 # The build output has to exist, otherwise pm2 starts a process that
 # exits immediately.
-if [ -f dist/main.js ]; then
-  ok "dist/main.js present"
+ENTRY="${BUILD_ENTRY:-}"
+if [ -n "$ENTRY" ] && [ -e "$ENTRY" ]; then
+  ok "build entrypoint ($ENTRY) present"
+elif [ -f dist/main.js ] || [ -f dist/index.js ] || [ -f build/index.js ] || [ -f build/main.js ] || [ -f .next/BUILD_ID ]; then
+  found=$(ls -1 dist/main.js dist/index.js build/index.js build/main.js .next/BUILD_ID 2>/dev/null | head -1)
+  ok "build output ($found) present"
+elif [ -f package.json ] && ! grep -q '"build"' package.json; then
+  ok "no build step defined in package.json"
 else
-  fail "dist/main.js missing - did the build run?"
+  fail "build output missing (checked dist/, build/, .next/) - set BUILD_ENTRY or run build first"
 fi
 
 # Lockfile drift means the deployed tree is not the tested tree.

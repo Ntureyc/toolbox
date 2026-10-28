@@ -1,18 +1,20 @@
-// Reference ecosystem file.
+// Reference ecosystem file for PM2.
 //
-//   pm2 start ecosystem.config.js --name my-app
+// Usage:
+//   pm2 start ecosystem.config.js
+//   pm2 start ecosystem.config.js --only api-service
 //
-// The names here match the apps that run on the boxes, so a deploy
-// script can rely on them.
+// Production-ready defaults for multi-service environments (API + Web Frontend).
 
 module.exports = {
   apps: [
     {
-      name: 'business-koro-api',
-      cwd: '/home/ntureyc/business-koro/backend',
+      name: 'api-service',
+      cwd: './backend',
       script: 'bun',
       args: 'run dist/main.js',
       interpreter: 'none',
+      instances: 1,
       max_memory_restart: '1G',
       min_uptime: '30s',
       restart_delay: 2000,
@@ -20,14 +22,16 @@ module.exports = {
       autorestart: true,
       env: {
         NODE_ENV: 'production',
+        PORT: 3000,
       },
     },
     {
-      name: 'business-koro-web',
-      cwd: '/home/ntureyc/business-koro/frontend',
+      name: 'web-frontend',
+      cwd: './frontend',
       script: 'bun',
-      args: 'run next start -p 3012',
+      args: 'run next start -p 3001',
       interpreter: 'none',
+      instances: 1,
       max_memory_restart: '1G',
       min_uptime: '30s',
       restart_delay: 2000,
@@ -35,6 +39,7 @@ module.exports = {
       autorestart: true,
       env: {
         NODE_ENV: 'production',
+        PORT: 3001,
       },
     },
   ],

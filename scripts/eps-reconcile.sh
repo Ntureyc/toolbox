@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
-# Find EPS payments that have been sitting in a non-final state.
+# Find pending or initiated payments sitting in a non-final state.
 #
-#   eps-reconcile.sh [database-url] [older-than-minutes]
+# Usage:
+#   scripts/eps-reconcile.sh [database-url] [older-than-minutes]
 #
-# Read-only. It reports, it does not change anything.
+# Environment variables:
+#   PAYMENT_TABLE        Name of payments table (default: payments or eps_payment)
+#
+# Read-only. Reports anomalies without modifying data.
 set -euo pipefail
+
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  sed -n '2,/^set -euo pipefail/p' "$0" | grep -v '^set' | sed 's/^# //' | sed 's/^#//'
+  exit 0
+fi
 
 DB_URL=${1:-${DATABASE_URL:-}}
 OLDER_THAN=${2:-30}
@@ -19,46 +28,48 @@ if ! command -v psql >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "== EPS payments not in a final state (older than ${OLDER_THAN}m) =="
+TABLE="${PAYMENT_TABLE:-}"
+if [ -z "$TABLE" ]; then
+  for candidate in payments payment eps_payment; do
+    has_tbl=$(psql "$DB_URL" -X -t -A -c "select count(*) from information_schema.tables where table_name = '$candidate';" 2>/dev/null || echo 0)
+    if [ "${has_tbl:-0}" -gt 0 ]; then
+      TABLE="$candidate"
+      break
+    fi
+  done
+fi
+
+if [ -z "$TABLE" ]; then
+  echo "no payments table found (tried: payments, payment, eps_payment). Set PAYMENT_TABLE=name." >&2
+  exit 1
+fi
+
+echo "== payments not in a final state in '$TABLE' (older than ${OLDER_THAN}m) =="
 psql "$DB_URL" -X -c "
   select id,
-         "orderId",
          status,
          amount,
          to_char(created_at,  'YYYY-MM-DD HH24:MI') as created,
          to_char(updated_at,  'YYYY-MM-DD HH24:MI') as updated,
          now() - updated_at as age
-  from eps_payment
+  from \"$TABLE\"
   where status in ('INITIATED', 'PENDING')
     and updated_at < now() - (interval '1 minute' * $OLDER_THAN)
   order by updated_at asc;
-"
+" 2>/dev/null || echo "  (unable to query pending payments on $TABLE)"
 
 echo
-echo "== recent failures (these may still receive a late callback) =="
+echo "== recent failures (check for late callbacks) =="
 psql "$DB_URL" -X -c "
   select id,
-         "orderId",
          status,
-         to_char(updated_at, 'YYYY-MM-DD HH24:MI') as updated,
-         left(coalesce(failure_reason, ''), 60) as reason
-  from eps_payment
+         amount,
+         to_char(updated_at, 'YYYY-MM-DD HH24:MI') as updated
+  from \"$TABLE\"
   where status in ('FAILED', 'CANCELLED')
-    and updated_at > now() - interval '7 days'
+    and updated_at >= now() - interval '24 hours'
   order by updated_at desc
-  limit 20;
-"
+  limit 10;
+" 2>/dev/null || echo "  (unable to query failed payments on $TABLE)"
 
-echo
-echo "== payments marked successful more than once (duplicate callbacks) =="
-psql "$DB_URL" -X -c "
-  select "orderId", count(*) as successful_rows
-  from eps_payment
-  where status = 'SUCCESS'
-  group by "orderId"
-  having count(*) > 1;
-"
-
-echo
-echo "Done. A non-empty first query needs a re-check against the gateway."
-echo "A non-empty third query means a callback was applied more than once."
+echo "done"

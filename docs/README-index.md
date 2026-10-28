@@ -13,9 +13,9 @@ A script that needs arguments has a `--help` that says what they are.
 
 Conventional commits, one line, lowercase after the type:
 
-    feat(scripts): add router-status.sh
+    feat(scripts): add ssl-inspect.sh
     fix(deploy): use --ff-only so a dirty tree stops the pull
-    docs(runbook): explain the EPS re-check rule
+    docs(runbook): explain the payment re-check rule
 
 The scope is the area, not the file. `feat(scripts)` for anything in
 scripts/, `docs(runbook)` for a runbook, `feat(src)` for the TypeScript.

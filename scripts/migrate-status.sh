@@ -1,15 +1,31 @@
 #!/usr/bin/env bash
 # Show which Prisma migrations are applied and which are not.
 # Read-only: it never runs a migration.
+#
+# Usage:
+#   scripts/migrate-status.sh [app-dir]
+#
+# Defaults to the current working directory.
 set -euo pipefail
 
-APP_DIR=${1:-/home/ntureyc/business-koro/backend}
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  sed -n '2,/^set -euo pipefail/p' "$0" | grep -v '^set' | sed 's/^# //' | sed 's/^#//'
+  exit 0
+fi
+
+APP_DIR=${1:-.}
 DRY_RUN=${DRY_RUN:-0}
+
+if [ ! -d "$APP_DIR" ]; then
+  echo "directory $APP_DIR does not exist" >&2
+  exit 1
+fi
 
 cd "$APP_DIR"
 
-if [ ! -f prisma/schema.prisma ]; then
-  echo "no prisma/schema.prisma in $APP_DIR" >&2
+if [ ! -f prisma/schema.prisma ] && [ ! -f schema.prisma ]; then
+  echo "no schema.prisma found in $APP_DIR or $APP_DIR/prisma" >&2
+  echo "usage: $0 [app-dir]" >&2
   exit 1
 fi
 
@@ -33,12 +49,14 @@ if [ -n "${DATABASE_URL:-}" ] && command -v psql >/dev/null 2>&1; then
     limit 10;
   " 2>/dev/null || echo "  (could not query _prisma_migrations)"
 else
-  echo "  (set DATABASE_URL to query the history)"
+  echo "  (set DATABASE_URL to query the history from Postgres directly)"
 fi
 
 echo
-echo "== migrations on disk but not in schema =="
-# A migration directory with no corresponding entry in the schema is
-# usually a leftover from a branch that was abandoned.
-ls -1 prisma/migrations 2>/dev/null | sed 's/_.*//' | sort -u | head -1 >/dev/null || true
-echo "  (compare the list above with prisma/migrations/)"
+echo "== migrations on disk =="
+if [ -d prisma/migrations ]; then
+  count=$(find prisma/migrations -mindepth 1 -maxdepth 1 -type d | wc -l)
+  echo "  $count migration(s) found in prisma/migrations/"
+else
+  echo "  (no prisma/migrations directory)"
+fi

@@ -6,7 +6,14 @@ set -euo pipefail
 WARN_DAYS=${WARN_DAYS:-30}
 FAIL_DAYS=${FAIL_DAYS:-7}
 
-conf=/etc/letsencrypt/live
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  echo "Usage: $0 [cert-dir]"
+  echo "Lists certificate expiry days for Let's Encrypt certificates (default: /etc/letsencrypt/live)."
+  echo "Options/Env: WARN_DAYS=30, FAIL_DAYS=7"
+  exit 0
+fi
+
+conf=${1:-/etc/letsencrypt/live}
 
 if [ ! -d "$conf" ]; then
   echo "no certificate directory at $conf"

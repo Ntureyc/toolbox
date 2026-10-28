@@ -6,6 +6,12 @@
 # when the disk fills.
 set -euo pipefail
 
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  echo "Usage: $0"
+  echo "Audits recurring jobs: systemd timers, crontabs, recent backup dumps, and log growth."
+  exit 0
+fi
+
 status=0
 fail() { echo "  FAIL: $*" >&2; status=1; }
 ok()   { echo "  ok:   $*"; }

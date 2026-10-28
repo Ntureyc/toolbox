@@ -7,6 +7,12 @@ set -euo pipefail
 DRY_RUN=${DRY_RUN:-0}
 SETTLE_SECONDS=${SETTLE_SECONDS:-10}
 
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  echo "Usage: $0 <app> [app...]"
+  echo "Options/Env: DRY_RUN=1, SETTLE_SECONDS=10"
+  exit 0
+fi
+
 APPS=("$@")
 if [ "${#APPS[@]}" -eq 0 ]; then
   echo "usage: $0 <app> [app...]" >&2
