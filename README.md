@@ -6,58 +6,69 @@ Everything here is plain shell or single-file scripts with zero unnecessary depe
 
 ## Layout
 
-    scripts/   production operational and diagnostic scripts (bash)
+    scripts/   production operational and diagnostic tools (each in its own directory)
     configs/   reference config snippets (Nginx, PM2, etc.)
     docs/      runbooks and architecture notes
     src/       utility helpers and formatting tests (TypeScript / Bun)
 
+Each tool inside `scripts/<tool>/` includes:
+- `<tool>.sh`: Standalone POSIX-ish bash script
+- `README.md`: Detailed documentation, requirements, options table, and examples
+- `preview.png`: Visual terminal screenshot of the tool in action
+
 ## Conventions
 
 - Scripts are POSIX-ish bash with `set -euo pipefail`.
-- Scripts support `-h` / `--help` flags with clear usage instructions.
+- Every script supports `-h` / `--help` flags with clear usage instructions.
 - Maintenance and database tasks support `--dry-run` modes before making destructive changes.
 - Configurable via CLI flags and standard environment variables.
+
+---
 
 ## Tools & Scripts
 
 ### System & Health Monitoring
 
-| Script | What it does |
-| --- | --- |
-| [`scripts/system-info.sh`](scripts/system-info.sh) | Terminal dashboard of OS, Kernel, CPU, RAM, Disk, Network, and services |
-| [`scripts/health-check.sh`](scripts/health-check.sh) | One-shot health verification of PM2 apps, HTTP endpoints, and system resources |
-| [`scripts/disk-usage.sh`](scripts/disk-usage.sh) | Disk space breakdown, inode usage, top directories, and largest files |
-| [`scripts/job-health.sh`](scripts/job-health.sh) | Audit systemd timers, crontabs, backup age, and PM2 log sizes |
-| [`scripts/sys-cleanup.sh`](scripts/sys-cleanup.sh) | Safe cleanup of journal logs, package caches, old temp files, and Docker |
+| Tool | What it does | Docs & Showcase |
+| --- | --- | --- |
+| [`system-info`](scripts/system-info/system-info.sh) | Terminal dashboard of OS, Kernel, CPU, RAM, Disk, Network, and services | [README](scripts/system-info/README.md) · [Preview](scripts/system-info/preview.png) |
+| [`health-check`](scripts/health-check/health-check.sh) | One-shot health verification of PM2 apps, HTTP endpoints, and system resources | [README](scripts/health-check/README.md) · [Preview](scripts/health-check/preview.png) |
+| [`disk-usage`](scripts/disk-usage/disk-usage.sh) | Disk space breakdown, inode usage, top directories, and largest files | [README](scripts/disk-usage/README.md) · [Preview](scripts/disk-usage/preview.png) |
+| [`job-health`](scripts/job-health/job-health.sh) | Audit systemd timers, crontabs, backup age, and PM2 log sizes | [README](scripts/job-health/README.md) · [Preview](scripts/job-health/preview.png) |
+| [`sys-cleanup`](scripts/sys-cleanup/sys-cleanup.sh) | Safe cleanup of journal logs, package caches, old temp files, and Docker | [README](scripts/sys-cleanup/README.md) · [Preview](scripts/sys-cleanup/preview.png) |
 
 ### Network & Security
 
-| Script | What it does |
-| --- | --- |
-| [`scripts/port-audit.sh`](scripts/port-audit.sh) | Scan listening sockets and flag sensitive databases/caches exposed on `0.0.0.0` |
-| [`scripts/ssl-inspect.sh`](scripts/ssl-inspect.sh) | Inspect remote TLS certificates, validity days, SANs, cipher, and TLS version |
-| [`scripts/cert-expiry.sh`](scripts/cert-expiry.sh) | List Let's Encrypt certificates and highlight upcoming expirations |
-| [`scripts/nginx-test.sh`](scripts/nginx-test.sh) | Validate Nginx configuration (`nginx -t`) and isolate broken vhosts |
-| [`scripts/bench-http.sh`](scripts/bench-http.sh) | Dependency-free HTTP latency and throughput benchmarker with percentile breakdown |
+| Tool | What it does | Docs & Showcase |
+| --- | --- | --- |
+| [`port-audit`](scripts/port-audit/port-audit.sh) | Scan listening sockets and flag sensitive databases/caches exposed on `0.0.0.0` | [README](scripts/port-audit/README.md) · [Preview](scripts/port-audit/preview.png) |
+| [`ssl-inspect`](scripts/ssl-inspect/ssl-inspect.sh) | Inspect remote TLS certificates, validity days, SANs, cipher, and TLS version | [README](scripts/ssl-inspect/README.md) · [Preview](scripts/ssl-inspect/preview.png) |
+| [`cert-expiry`](scripts/cert-expiry/cert-expiry.sh) | List Let's Encrypt certificates and highlight upcoming expirations | [README](scripts/cert-expiry/README.md) · [Preview](scripts/cert-expiry/preview.png) |
+| [`nginx-test`](scripts/nginx-test/nginx-test.sh) | Validate Nginx configuration (`nginx -t`) and isolate broken vhosts | [README](scripts/nginx-test/README.md) · [Preview](scripts/nginx-test/preview.png) |
+| [`bench-http`](scripts/bench-http/bench-http.sh) | Dependency-free HTTP latency and throughput benchmarker with percentile breakdown | [README](scripts/bench-http/README.md) · [Preview](scripts/bench-http/preview.png) |
 
 ### Deployment & Application Lifecycle
 
-| Script | What it does |
-| --- | --- |
-| [`scripts/deploy-check.sh`](scripts/deploy-check.sh) | Pre-flight release checks: build artifacts, lockfile integrity, git branch state |
-| [`scripts/pm2-restart-graceful.sh`](scripts/pm2-restart-graceful.sh) | Restart PM2 apps sequentially with health settlement checks |
-| [`scripts/log-tail.sh`](scripts/log-tail.sh) | Filter noisy logs to isolate real errors, exceptions, and timeouts |
-| [`scripts/next-build-check.sh`](scripts/next-build-check.sh) | Verify Next.js standalone outputs, `.next` bundles, and build environment vars |
-| [`scripts/migrate-status.sh`](scripts/migrate-status.sh) | Non-destructive Prisma migration status and schema verification |
-| [`scripts/env-audit.sh`](scripts/env-audit.sh) | Compare `.env` against `.env.example` to catch missing keys and weak secrets |
-| [`scripts/git-cleanup.sh`](scripts/git-cleanup.sh) | Prune stale remote tracking branches, merged local branches, and run `git gc` |
+| Tool | What it does | Docs & Showcase |
+| --- | --- | --- |
+| [`deploy-check`](scripts/deploy-check/deploy-check.sh) | Pre-flight release checks: build artifacts, lockfile integrity, git branch state | [README](scripts/deploy-check/README.md) · [Preview](scripts/deploy-check/preview.png) |
+| [`pm2-restart-graceful`](scripts/pm2-restart-graceful/pm2-restart-graceful.sh) | Restart PM2 apps sequentially with health settlement checks | [README](scripts/pm2-restart-graceful/README.md) · [Preview](scripts/pm2-restart-graceful/preview.png) |
+| [`log-tail`](scripts/log-tail/log-tail.sh) | Filter noisy logs to isolate real errors, exceptions, and timeouts | [README](scripts/log-tail/README.md) · [Preview](scripts/log-tail/preview.png) |
+| [`next-build-check`](scripts/next-build-check/next-build-check.sh) | Verify Next.js standalone outputs, `.next` bundles, and build environment vars | [README](scripts/next-build-check/README.md) · [Preview](scripts/next-build-check/preview.png) |
+| [`migrate-status`](scripts/migrate-status/migrate-status.sh) | Non-destructive Prisma migration status and schema verification | [README](scripts/migrate-status/README.md) · [Preview](scripts/migrate-status/preview.png) |
+| [`env-audit`](scripts/env-audit/env-audit.sh) | Compare `.env` against `.env.example` to catch missing keys and weak secrets | [README](scripts/env-audit/README.md) · [Preview](scripts/env-audit/preview.png) |
+| [`git-cleanup`](scripts/git-cleanup/git-cleanup.sh) | Prune stale remote tracking branches, merged local branches, and run `git gc` | [README](scripts/git-cleanup/README.md) · [Preview](scripts/git-cleanup/preview.png) |
 
 ### Database & Storage
 
-| Script | What it does |
-| --- | --- |
-| [`scripts/psql-inspect.sh`](scripts/psql-inspect.sh) | Deep PostgreSQL diagnostics: connection states, cache hit %, table sizes, bloat |
-| [`scripts/pg-backup.sh`](scripts/pg-backup.sh) | Logical Postgres backups with daily, weekly, and monthly hardlinked tiers |
-| [`scripts/psql-daily-report.sh`](scripts/psql-daily-report.sh) | Daily database summary and high-level health report |
+| Tool | What it does | Docs & Showcase |
+| --- | --- | --- |
+| [`psql-inspect`](scripts/psql-inspect/psql-inspect.sh) | Deep PostgreSQL diagnostics: connection states, cache hit %, table sizes, bloat | [README](scripts/psql-inspect/README.md) · [Preview](scripts/psql-inspect/preview.png) |
+| [`pg-backup`](scripts/pg-backup/pg-backup.sh) | Logical Postgres backups with daily, weekly, and monthly hardlinked tiers | [README](scripts/pg-backup/README.md) · [Preview](scripts/pg-backup/preview.png) |
+| [`psql-daily-report`](scripts/psql-daily-report/psql-daily-report.sh) | Daily database summary and high-level health report | [README](scripts/psql-daily-report/README.md) · [Preview](scripts/psql-daily-report/preview.png) |
+| [`eps-reconcile`](scripts/eps-reconcile/eps-reconcile.sh) | Query stuck payment records and surface unhandled callback anomalies | [README](scripts/eps-reconcile/README.md) · [Preview](scripts/eps-reconcile/preview.png) |
+| [`router-status`](scripts/router-status/router-status.sh) | Inspect PPPoE subscriber session counts and router accounting | [README](scripts/router-status/README.md) · [Preview](scripts/router-status/preview.png) |
+
+---
 
 Runbooks live in `docs/` and are indexed in [`docs/index.md`](docs/index.md).
